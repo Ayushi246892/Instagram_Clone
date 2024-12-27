@@ -1,51 +1,63 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import './SignIn.css';
-import logo from '../images/logo.png';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from "react";
+import "./SignIn.css";
+import logo from "../img/logo.png";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
+import { LoginContext } from "../context/LoginContext";
 
-const SignIn = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+export default function SignIn() {
+  const { setUserLogin } = useContext(LoginContext)
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  // Toast functions
+  const notifyA = (msg) => toast.error(msg)
+  const notifyB = (msg) => toast.success(msg)
 
-  // Handle input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent page reload
-    console.log('Sign In Data:', formData); // Print form data to console
+  const postData = () => {
+    //checking email
+    if (!emailRegex.test(email)) {
+      notifyA("Invalid email")
+      return
+    }
+    // Sending data to server
+    fetch("http://localhost:5000/signin", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password
 
-    // Perform any additional form validation or API call here
+      })
+    }).then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          notifyA(data.error)
+        } else {
+          notifyB("Signed In Successfully")
+          console.log(data)
+          localStorage.setItem("jwt", data.token)
+          localStorage.setItem("user", JSON.stringify(data.user))
 
-    // Redirect to the home page
-    navigate('/');
-  };
+          setUserLogin(true)
+          navigate("/")
+        }
+        console.log(data)
+      })
+  }
 
   return (
-    <div className="signin">
+    <div className="signIn">
       <div>
-        <form className="loginform" onSubmit={handleSubmit}>
-          <img src={logo} className="signuplogo" alt="" />
+        <div className="loginForm">
+          <img className="signUpLogo" src={logo} alt="" />
           <div>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-            />
+            <input type="email" name="email" id="email" value={email} placeholder="Email" onChange={(e) => { setEmail(e.target.value) }} />
           </div>
           <div>
             <input
@@ -53,23 +65,19 @@ const SignIn = () => {
               name="password"
               id="password"
               placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
+              value={password}
+              onChange={(e) => { setPassword(e.target.value) }}
             />
           </div>
-          <input type="submit" id="login-btn" value="Sign In" />
-        </form>
-        <div className="loginform2">
-          Don't have an account?{' '}
+          <input type="submit" id="login-btn" onClick={() => { postData() }} value="Sign In" />
+        </div>
+        <div className="loginForm2">
+          Don't have an account ?
           <Link to="/signup">
-            <span style={{ color: 'blue', cursor: 'pointer' }}>Sign Up</span>
+            <span style={{ color: "blue", cursor: "pointer" }}>Sign Up</span>
           </Link>
         </div>
       </div>
     </div>
   );
-};
-
-export default SignIn;
-
-
+}
