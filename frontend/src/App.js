@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import SignUp from "./components/SignUp";
 import SignIn from "./components/SignIn";
-import Profie from "./components/Profie";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Createpost from "./components/Createpost";
@@ -14,6 +13,7 @@ import { LoginContext } from "./context/LoginContext";
 import Modal from "./components/Modal";
 import UserProfie from "./components/UserProfile";
 import MyFolliwngPost from "./components/MyFollowingPost";
+import Profile from "./components/Profile";
 
 function App() {
   const [userLogin, setUserLogin] = useState(false);
@@ -27,7 +27,7 @@ function App() {
             <Route path="/" element={<Home />}></Route>
             <Route path="/signup" element={<SignUp />}></Route>
             <Route path="/signin" element={<SignIn />}></Route>
-            <Route exact path="/profile" element={<Profie />}></Route>
+            <Route exact path="/profile" element={<Profile/>}></Route>
             <Route path="/createPost" element={<Createpost />}></Route>
             <Route path="/profile/:userid" element={<UserProfie />}></Route>
             <Route path="/followingpost" element={<MyFolliwngPost />}></Route>

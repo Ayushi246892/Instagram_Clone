@@ -3,7 +3,7 @@ import PostDetail from "./PostDetail";
 import "./Profile.css";
 import ProfilePic from "./ProfilePic";
 
-export default function Profie() {
+export default function Profile() {
   var picLink = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png"
   const [pic, setPic] = useState([]);
   const [show, setShow] = useState(false)
