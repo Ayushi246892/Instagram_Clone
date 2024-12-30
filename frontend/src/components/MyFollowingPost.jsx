@@ -3,6 +3,7 @@ import "./Home.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import ProfilePic from "./ProfilePic";
 
 export default function MyFolliwngPost() {
   const navigate = useNavigate();
@@ -10,10 +11,15 @@ export default function MyFolliwngPost() {
   const [comment, setComment] = useState("");
   const [show, setShow] = useState(false);
   const [item, setItem] = useState([]);
+  const [user, setUser] = useState("")
+  const [pic, setPic] = useState([]);
 
   // Toast functions
   const notifyA = (msg) => toast.error(msg);
   const notifyB = (msg) => toast.success(msg);
+
+   var picLink = "https://cdn-icons-png.flaticon.com/128/3177/3177440.png"
+    const [changePic, setChangePic] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem("jwt");
@@ -69,6 +75,22 @@ export default function MyFolliwngPost() {
         console.log(result);
       });
   };
+
+   useEffect(() => {
+      fetch(`http://localhost:5000/user/${JSON.parse(localStorage.getItem("user"))._id}`, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("jwt"),
+        },
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          console.log(result)
+          setPic(result.post);
+          setUser(result.user)
+          console.log(pic);
+        });
+    }, []);
+
   const unlikePost = (id) => {
     fetch("http://localhost:5000/unlike", {
       method: "put",
@@ -93,6 +115,14 @@ export default function MyFolliwngPost() {
         console.log(result);
       });
   };
+
+  const changeprofile = () => {
+    if (changePic) {
+      setChangePic(false)
+    } else {
+      setChangePic(true)
+    }
+  }
 
   // function to make comment
   const makeComment = (text, id) => {
@@ -132,10 +162,11 @@ export default function MyFolliwngPost() {
             {/* card header */}
             <div className="card-header">
               <div className="card-pic">
-                <img
-                  src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8MnwwfHw%3D&auto=format&fit=crop&w=500&q=60"
-                  alt=""
-                />
+              <img
+             onClick={changeprofile}
+            src={user.Photo ? user.Photo : picLink}
+            alt=""
+            />
               </div>
               <h5>
                 <Link to={`/profile/${posts.postedBy._id}`}>
@@ -291,6 +322,10 @@ export default function MyFolliwngPost() {
           </div>
         </div>
       )}
+      {
+              changePic &&
+              <ProfilePic changeprofile={changeprofile} />
+            }
     </div>
   );
 }
